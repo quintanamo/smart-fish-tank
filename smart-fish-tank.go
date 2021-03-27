@@ -18,8 +18,11 @@ func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration) {
 }
 
 func main() {
+    dbUsername := "root"
+    dbPassword := ""
+    dbAddress := "127.0.0.1:3360"
     // connect to mysql database
-    db, err := sql.Open("mysql", "root:Ycas2018!@tcp(127.0.0.1:3306)/")
+    db, err := sql.Open("mysql", dbUsername+":"+dbPassword+"@tcp"+dbAddress+"/")
     // if there is an error opening the connection, handle it
     if err != nil {
         panic(err.Error())

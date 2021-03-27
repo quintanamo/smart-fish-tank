@@ -21,6 +21,7 @@ func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration) {
 }
 
 func main() {
+    fmt.Println("\nStarting Smart Fish Tank...")
     // default config values
     var dbUsername string = "root"
     var dbPassword string = ""
@@ -28,15 +29,16 @@ func main() {
     // read from config file
     configJSON, err := os.Open("config.json")
     if err != nil {
-        fmt.Println("Error reading \"config.json\", running with default config.")
+        fmt.Println("\033[31mError reading \"config.json\", running with default config.\033[0m")
     } else {
-        fmt.Println("Loading config values from \"config.json\".")
+        fmt.Println("Loading config values from \"config.json\"...")
         byteValue, _ := ioutil.ReadAll(configJSON)
         var configValues map[string]interface{}
         json.Unmarshal([]byte(byteValue), &configValues)
         dbUsername = configValues["database"].(map[string]interface{})["username"].(string)
         dbPassword = configValues["database"].(map[string]interface{})["password"].(string)
         dbAddress = configValues["database"].(map[string]interface{})["address"].(string)
+        fmt.Println("\033[32mSuccessfully loading config values!\033[0m")
     }
     defer configJSON.Close()
 
@@ -44,9 +46,9 @@ func main() {
     db, err := sql.Open("mysql", dbUsername+":"+dbPassword+"@tcp("+dbAddress+")/")
     // if there is an error opening the connection, handle it
     if err != nil {
-        panic(err.Error())
+        fmt.Println("\033[31m"+err.Error()+"\033[0m")
     } else {
-        fmt.Println("Successfully connected to MySQL.")
+        fmt.Println("\033[32mSuccessfully connected to MySQL.\033[0m")
     }
     // close db when main finishes executing
     defer db.Close()
@@ -54,10 +56,10 @@ func main() {
     insert, err := db.Query("CREATE DATABASE IF NOT EXISTS `smart-fish-tank`;")
     // if there is an error inserting, handle it
     if err != nil {
-        fmt.Println(err.Error())
-        fmt.Println("Continuing without database \"smart-fish-tank\".")
+        fmt.Println("\033[31m"+err.Error()+"\033[0m")
+        fmt.Println("\033[31mContinuing without database \"smart-fish-tank\".\033[0m")
     } else {
-        fmt.Println("Using database \"smart-fish-tank\".")
+        fmt.Println("\033[32mUsing database \"smart-fish-tank\".\033[0m")
     }
     // be careful deferring Queries if you are using transactions
     defer insert.Close()
@@ -70,7 +72,7 @@ func main() {
     fileServer := http.FileServer(http.Dir("./static"))
     http.Handle("/", fileServer)
     // serve content on port 8080
-    fmt.Printf("Running server on port 8080...\n")
+    fmt.Println("\033[36mRunning server on port 8080...\n\033[0m")
     if err := http.ListenAndServe(":8080", nil); err != nil {
         log.Fatal(err)
     }

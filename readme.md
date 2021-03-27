@@ -10,3 +10,9 @@ The current hardware being used in the development of this project:
 - ULN2003APG Motor Controller
 - ADM1602U 16x2 Serial LCD Screen
 - *TBD: Temperature Sensor*
+
+## Other Requirements
+- MySQL installation: [Download](https://dev.mysql.com/downloads/installer/)
+
+> Developed by Quintin Herb.
+> [QuintinHerb.net](https://quintinherb.net)

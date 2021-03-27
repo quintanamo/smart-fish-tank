@@ -1,0 +1,11 @@
+{
+    "database": {
+        "username": "root",
+        "password": "",
+        "address": "127.0.0.1:3306"
+    },
+    "temperature": {
+        "units": "F",
+        "interval": "6000"
+    }
+}

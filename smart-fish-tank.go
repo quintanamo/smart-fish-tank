@@ -7,6 +7,9 @@ import (
     "time"
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
+    "encoding/json"
+    "io/ioutil"
+    "os"
 )
 
 // function called when the ticker elapses
@@ -18,11 +21,27 @@ func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration) {
 }
 
 func main() {
-    dbUsername := "root"
-    dbPassword := ""
-    dbAddress := "127.0.0.1:3360"
+    // default config values
+    var dbUsername string = "root"
+    var dbPassword string = ""
+    var dbAddress string = "127.0.0.1:3306"
+    // read from config file
+    configJSON, err := os.Open("config.json")
+    if err != nil {
+        fmt.Println("Error reading \"config.json\", running with default config.")
+    } else {
+        fmt.Println("Loading config values from \"config.json\".")
+        byteValue, _ := ioutil.ReadAll(configJSON)
+        var configValues map[string]interface{}
+        json.Unmarshal([]byte(byteValue), &configValues)
+        dbUsername = configValues["database"].(map[string]interface{})["username"].(string)
+        dbPassword = configValues["database"].(map[string]interface{})["password"].(string)
+        dbAddress = configValues["database"].(map[string]interface{})["address"].(string)
+    }
+    defer configJSON.Close()
+
     // connect to mysql database
-    db, err := sql.Open("mysql", dbUsername+":"+dbPassword+"@tcp"+dbAddress+"/")
+    db, err := sql.Open("mysql", dbUsername+":"+dbPassword+"@tcp("+dbAddress+")/")
     // if there is an error opening the connection, handle it
     if err != nil {
         panic(err.Error())
@@ -51,7 +70,7 @@ func main() {
     fileServer := http.FileServer(http.Dir("./static"))
     http.Handle("/", fileServer)
     // serve content on port 8080
-    fmt.Printf("Starting server on port 8080\n")
+    fmt.Printf("Running server on port 8080...\n")
     if err := http.ListenAndServe(":8080", nil); err != nil {
         log.Fatal(err)
     }

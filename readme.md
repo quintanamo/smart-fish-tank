@@ -14,5 +14,6 @@ The current hardware being used in the development of this project:
 ## Other Requirements
 - MySQL installation: [Download](https://dev.mysql.com/downloads/installer/)
 
-> Developed by Quintin Herb.
-> [QuintinHerb.net](https://quintinherb.net)
+> Developed by Quintin Herb   
+> [QuintinHerb.net](https://quintinherb.net)   
+> [quintin@quintinherb.net](mailto:quintin@quintinherb.net)   

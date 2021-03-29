@@ -52,12 +52,12 @@ func main() {
     defer port.Close()
     b := []byte("Test")
     port.Write(b)
-    port.Write([]byte(SET_LCD_START))
-    b = []byte(CLEAR_LCD)
-    port.Write(b)
-    port.Write([]byte(SET_LCD_START))
-    b = []byte("Writing after clear.")
-    port.Write(b)
+    // port.Write([]byte(SET_LCD_START))
+    // b = []byte(CLEAR_LCD)
+    // port.Write(b)
+    // port.Write([]byte(SET_LCD_START))
+    // b = []byte("Writing after clear.")
+    // port.Write(b)
 
     fmt.Println("\nStarting Smart Fish Tank...")
     // default config values

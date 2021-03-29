@@ -36,7 +36,8 @@ func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration, db *sql.
 
 
 func main() {
-    const CLEAR_LCD = "\xFE\x01                                \xFE\x01"
+    const SET_LCD_START = "\xFE\x01"
+    const CLEAR_LCD = "                                "
     options := serial.OpenOptions{
         PortName: "/dev/serial0",
         BaudRate: 19200,
@@ -51,8 +52,10 @@ func main() {
     defer port.Close()
     b := []byte("Test")
     port.Write(b)
+    port.Write(SET_LCD_START)
     b = []byte(CLEAR_LCD)
     port.Write(b)
+    port.Write(SET_LCD_START)
     b = []byte("Writing after clear.")
     port.Write(b)
 

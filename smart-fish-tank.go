@@ -34,7 +34,9 @@ func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration, db *sql.
 	}
 }
 
+
 func main() {
+    const CLEAR_LCD = "\xFE\x01                                \xFE\x01"
     options := serial.OpenOptions{
         PortName: "/dev/serial0",
         BaudRate: 19200,
@@ -48,10 +50,11 @@ func main() {
     }
     defer port.Close()
     b := []byte("Test")
-    n, err := port.Write(b)
-    if err != nil {
-      fmt.Println(err)
-    }
+    port.Write(b)
+    b = []byte(CLEAR_LCD)
+    port.Write(b)
+    b = []byte("Writing after clear.")
+    port.Write(b)
 
     fmt.Println("\nStarting Smart Fish Tank...")
     // default config values

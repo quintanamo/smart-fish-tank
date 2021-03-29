@@ -50,7 +50,7 @@ func main() {
     }
     defer port.Close()
     port.Write([]byte(CLEAR_LCD))
-    b = []byte([]byte("Testing ;)"))
+    port.Write([]byte("Hello from      GoLang"))
 
     fmt.Println("\nStarting Smart Fish Tank...")
     // default config values

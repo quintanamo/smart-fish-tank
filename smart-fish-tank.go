@@ -40,7 +40,7 @@ func main() {
     //CLEAR_LCD := strconv.QuoteToASCII("                                ")
     options := serial.OpenOptions{
         PortName: "/dev/serial0",
-        BaudRate: 19200,
+        BaudRate: 9600,
         DataBits: 8,
         StopBits: 1,
         MinimumReadSize: 4,

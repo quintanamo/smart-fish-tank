@@ -52,10 +52,10 @@ func main() {
     defer port.Close()
     b := []byte("Test")
     port.Write(b)
-    port.Write(SET_LCD_START)
+    port.Write([]byte(SET_LCD_START))
     b = []byte(CLEAR_LCD)
     port.Write(b)
-    port.Write(SET_LCD_START)
+    port.Write([]byte(SET_LCD_START))
     b = []byte("Writing after clear.")
     port.Write(b)
 

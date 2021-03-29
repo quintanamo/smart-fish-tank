@@ -51,7 +51,11 @@ func main() {
     }
     defer port.Close()
     b := []byte("Test")
-    port.Write(b)
+    n, err := port.Write(b)
+    if (err != nil) {
+        fmt.Println(err)
+    }
+    fmt.Println(n)
     // port.Write([]byte(SET_LCD_START))
     // b = []byte(CLEAR_LCD)
     // port.Write(b)

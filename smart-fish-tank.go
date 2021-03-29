@@ -36,8 +36,8 @@ func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration, db *sql.
 
 
 func main() {
-    SET_LCD_START := strconv.QuoteToASCII("\xFE\x01")
-    CLEAR_LCD := strconv.QuoteToASCII("                                ")
+    //SET_LCD_START := strconv.QuoteToASCII("\xFE\x01")
+    //CLEAR_LCD := strconv.QuoteToASCII("                                ")
     options := serial.OpenOptions{
         PortName: "/dev/serial0",
         BaudRate: 19200,

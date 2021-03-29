@@ -10,17 +10,49 @@ import (
     "encoding/json"
     "io/ioutil"
     "os"
+    "math/rand"
+    "strconv"
+    "github.com/jacobsa/go-serial/serial"
 )
 
 // function called when the ticker elapses
-func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration) {
+func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration, db *sql.DB) {
 	ticker := time.NewTicker(getCurrentTemperatureInterval)
+    randomTemp := rand.Float64()*20+40
+    tempAsStr := strconv.FormatFloat(randomTemp, 'E', -1, 64)
 	for _ = range ticker.C {
-		fmt.Println("Tock")
+		insert, err := db.Query("INSERT INTO temperature_data (temperature, recorded) VALUES ("+tempAsStr+", NOW())")
+        // if there is an error inserting, handle it
+        if err != nil {
+            fmt.Println("\033[31m"+err.Error()+"\033[0m")
+            fmt.Println("\033[31mCannot add temperature data to database \"smart-fish-tank\".\033[0m")
+        } else {
+            fmt.Println("\033[32mTemperature data added to database \"smart-fish-tank\".\033[0m")
+        }
+        // be careful deferring Queries if you are using transactions
+        insert.Close()
 	}
 }
 
 func main() {
+    options := serial.OpenOptions{
+        PortName: "/dev/serial0",
+        BaudRate: 19200,
+        DataBits: 8,
+        StopBits: 1,
+        MinimumReadSize: 4,
+    }
+    port, err := serial.Open(options)
+    if err != nil {
+        fmt.Println(err)
+    }
+    defer port.Close()
+    b := []byte("Test")
+    n, err := port.Write(b)
+    if err != nil {
+      fmt.Println(err)
+    }
+
     fmt.Println("\nStarting Smart Fish Tank...")
     // default config values
     var dbUsername string = "root"
@@ -38,35 +70,25 @@ func main() {
         dbUsername = configValues["database"].(map[string]interface{})["username"].(string)
         dbPassword = configValues["database"].(map[string]interface{})["password"].(string)
         dbAddress = configValues["database"].(map[string]interface{})["address"].(string)
-        fmt.Println("\033[32mSuccessfully loading config values!\033[0m")
+        fmt.Println("\033[32mSuccessfully loaded config values!\033[0m")
     }
     defer configJSON.Close()
 
     // connect to mysql database
-    db, err := sql.Open("mysql", dbUsername+":"+dbPassword+"@tcp("+dbAddress+")/")
+    db, err := sql.Open("mysql", dbUsername+":"+dbPassword+"@tcp("+dbAddress+")/smart_fish_tank")
     // if there is an error opening the connection, handle it
     if err != nil {
         fmt.Println("\033[31m"+err.Error()+"\033[0m")
+        fmt.Println("\033[31mRunning without MySQL connection!  Data will not be saved!\033[0m")
     } else {
         fmt.Println("\033[32mSuccessfully connected to MySQL.\033[0m")
     }
     // close db when main finishes executing
     defer db.Close()
 
-    insert, err := db.Query("CREATE DATABASE IF NOT EXISTS `smart-fish-tank`;")
-    // if there is an error inserting, handle it
-    if err != nil {
-        fmt.Println("\033[31m"+err.Error()+"\033[0m")
-        fmt.Println("\033[31mContinuing without database \"smart-fish-tank\".\033[0m")
-    } else {
-        fmt.Println("\033[32mUsing database \"smart-fish-tank\".\033[0m")
-    }
-    // be careful deferring Queries if you are using transactions
-    defer insert.Close()
-
     // set defined temperature request interval
     getCurrentTemperatureInterval := 10 * time.Minute
-    go AddCurrentTemperature(getCurrentTemperatureInterval)
+    go AddCurrentTemperature(getCurrentTemperatureInterval, db)
 
     // serve the static folder
     fileServer := http.FileServer(http.Dir("./static"))

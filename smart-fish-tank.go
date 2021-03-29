@@ -8,12 +8,16 @@ import (
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
     "encoding/json"
+    "io"
     "io/ioutil"
     "os"
     "math/rand"
     "strconv"
     "github.com/jacobsa/go-serial/serial"
 )
+
+// globals
+const CLEAR_LCD = ("\xFE\x01                                \xFE\x01")
 
 // function called when the ticker elapses
 func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration, db *sql.DB) {
@@ -34,9 +38,12 @@ func AddCurrentTemperature(getCurrentTemperatureInterval time.Duration, db *sql.
 	}
 }
 
+func DisplayLCDMessage(message string, port io.ReadWriteCloser) {
+    port.Write([]byte(CLEAR_LCD))
+    port.Write([]byte(message))
+}
 
 func main() {
-    const CLEAR_LCD = ("\xFE\x01                                \xFE\x01")
     options := serial.OpenOptions{
         PortName: "/dev/serial0",
         BaudRate: 9600,
@@ -49,8 +56,7 @@ func main() {
         fmt.Println(err)
     }
     defer port.Close()
-    port.Write([]byte(CLEAR_LCD))
-    port.Write([]byte("Hello from      GoLang"))
+    DisplayLCDMessage("Starting smart  fish tank...", port)
 
     fmt.Println("\nStarting Smart Fish Tank...")
     // default config values
